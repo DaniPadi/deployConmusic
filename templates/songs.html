@@ -1,0 +1,50 @@
+{% extends 'music.html' %}
+
+{% block title %}Gestionar Canciones{% endblock %}
+
+{% block content %}
+<h1>Gestionar Canciones</h1>
+
+<h2>Agregar Nueva Canción</h2>
+<form method="POST" action="{{ url_for('music.manage_music') }}" enctype="multipart/form-data">
+    <label for="title">Título</label>
+    <input type="text" id="title" name="title" required>
+    
+    <label for="author">Autor</label>
+    <input type="text" id="author" name="author" required>
+
+    <label for="song">Canción</label>
+    <input type="file" id="song" name="song" accept="audio/*" required>
+
+    <br>
+    <label for="structure">Estructura</label>
+    <div id="structure" style="margin-bottom: 10px;">
+        <input type="button" class="structure-button" value="Intro">
+        <input type="button" class="structure-button" value="Estrofa">
+        <input type="button" class="structure-button" value="Pre-coro">
+        <input type="button" class="structure-button" value="Coro">
+        <input type="button" class="structure-button" value="Interludio">
+        <input type="button" class="structure-button" value="Puente">
+        <input type="button" class="structure-button" value="Outro">
+        <input type="button" id="removeLast" value="Borrar">
+    </div>
+
+    <input type="text" id="selectedStructure" name="structure" readonly style="width: 100%;">
+    
+    <button type="submit">Agregar Canción</button>
+</form>
+
+<script src="{{ url_for('static', filename='Js/structure.js') }}"></script>
+
+<h2>Lista de Canciones</h2>
+<ul>
+    {% for song in songs %}
+        <li>
+            {{ song.title }} - {{ song.author }}
+            <a href="{{ url_for('music.edit_song', id=song.id) }}">Editar</a>
+            <a href="{{ url_for('music.delete_song', id=song.id) }}">Eliminar</a>
+            <a href="{{ url_for('music.play_song', id=song.id) }}">Reproducir</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

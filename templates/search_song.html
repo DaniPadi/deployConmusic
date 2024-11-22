@@ -1,0 +1,23 @@
+{% extends 'music.html' %}
+
+{% block title %}Buscar Canción{% endblock %}
+
+{% block content %}
+<h1>Buscar Canción</h1>
+<form method="POST" action="{{ url_for('music.search_song') }}">
+    <label for="search">Buscar:</label>
+    <input type="text" id="search" name="searching_song" optional>
+    <button type="submit">Buscar</button>
+</form>
+<h2>Lista de Canciones</h2>
+
+<ul>
+    {% for song in songs %}
+        <li>
+            {{song.title}} - {{song.author}}
+            <a href="{{ url_for('music.play_song', id=song.id) }}">Reproducir</a>
+            <a href="{{ url_for('music.add_song', song_id= song.id) }}">Agregar a mi lista</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

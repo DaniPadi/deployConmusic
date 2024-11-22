@@ -1,0 +1,32 @@
+{% extends 'music.html' %}
+
+{% block title %}Editar Canción{% endblock %}
+
+{% block content %}
+<h1>Editar Canción</h1>
+<form method="POST" action="{{ url_for('music.edit_song', id=song.id) }}">
+    <label for="title">Título</label>
+    <input type="text" id="title" name="title" value="{{ song.title }}" required>
+    
+    <label for="author">Autor</label>
+    <input type="text" id="author" name="author" value="{{ song.author }}" required>
+    
+    <label for="song">Estructura</label>
+    <div id="structure" style="margin-bottom: 10px;">
+        <input type="button" class="structure-button" value="Intro">
+        <input type="button" class="structure-button" value="Estrofa">
+        <input type="button" class="structure-button" value="Pre-coro">
+        <input type="button" class="structure-button" value="Coro">
+        <input type="button" class="structure-button" value="Interludio">
+        <input type="button" class="structure-button" value="Puente">
+        <input type="button" class="structure-button" value="Outro">
+        <input type="button" id="removeLast" value="Borrar">
+    </div>
+
+    <input type="text" id="selectedStructure" name="structure" readonly style="width: 100%;" value="{{song.structure}}">
+
+    <button type="submit">Guardar Cambios</button>
+</form>
+<script src="{{ url_for('static', filename='Js/structure.js') }}"></script>
+
+{% endblock %}

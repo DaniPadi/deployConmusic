@@ -1,0 +1,22 @@
+{%extends 'music.html'%}
+
+{%block title%}Reproducir Canción{%endblock%}
+
+{%block content%}
+<h1>{{song.title}} - {{song.author}}</h1>
+{% if song.song_path %}
+<audio controls>
+    <source src="{{ url_for('music.uploaded_file', filename=song.song_path) }}" type="audio/mpeg">
+    Tu navegador no soporta la reproducción de audio.
+</audio>
+<br>
+<h2>Estructura</h2>
+<ul>
+    {% for part in song.structure.split(',') %}
+    <li>{{ part.strip() }}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No hay archivo de canción disponible para reproducir.</p>
+{%endif%}
+{%endblock%}
