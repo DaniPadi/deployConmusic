@@ -4,6 +4,7 @@ from extensions import db, login_manager
 from auth.routes import auth_bp
 from music.routes import music_bp
 from models import User
+from flask_wtf.csrf import CSRFProtect
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -11,7 +12,8 @@ def load_user(user_id):
 
 def create_app(config_name=None):
     app = Flask(__name__)
-    app.config['WTF_CSRF_ENABLED'] = False
+    csrf = CSRFProtect()
+    csrf.init_app(app) 
     app.config.from_object('config.config')
 
     db.init_app(app)
