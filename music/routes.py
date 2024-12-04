@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_from_directory
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import send_from_directory, jsonify
 from flask_login import login_required, current_user
 from models import Song, UserSong
 from extensions import db
@@ -9,16 +10,26 @@ music_bp= Blueprint('music', __name__, url_prefix='/music')
 @music_bp.route('/manage', methods= ['GET', 'POST'])
 @login_required
 def manage_music():
+  
+  def is_json_request():
+        # Verifica si el cliente solicita JSON basado en el encabezado o un parámetro.
+        return (
+            request.headers.get("Accept") == "application/json"
+            or request.args.get("response_type") == "json"
+        )
   if request.method== 'POST':
     title= request.form.get('title')
     author= request.form.get('author')
     song_file= request.files.get('song')
     structure= request.form.get('structure')
 
-    if song_file is None or song_file.filename == '':
-      flash('Por favor selecciona un archivo de canción.')
+    print(f'El archivo de canción {song_file}')
+    if song_file is None:
+      if is_json_request():
+        
+        return jsonify({"error": f"El archivo de canción no se subió {song_file}"}), 400
       return redirect(url_for('music.manage_music'))
-    
+    print(f'El archivo de canción {song_file.name}')
     upload_folder = os.path.join(current_app.instance_path, 'uploads')
     
     song_path= song_file.filename
@@ -32,12 +43,23 @@ def manage_music():
     new_user_song = UserSong(user_id=current_user.id, song_id=newSong.id)  # Asegúrate de que current_user está disponible
     db.session.add(new_user_song)
     db.session.commit()
+    if is_json_request():
+            return jsonify({
+                "message": "Canción subida exitosamente",
+                "song": {
+                    "id": newSong.id,
+                    "title": newSong.title,
+                    "author": newSong.author,
+                    "path": newSong.song_path,
+                    "structure": newSong.structure,
+                }
+            }), 201
 
-    flash('La canción fue agregada correctamente.')
     return redirect(url_for('music.manage_music'))
     
   user_songs = UserSong.query.filter_by(user_id=current_user.id).all()
   songs = [user_song.song for user_song in user_songs]
+  
   return render_template('songs.html', songs= songs)
 
 @music_bp.route('/edit/<int:id>', methods= ['GET', 'POST'])
@@ -49,7 +71,6 @@ def edit_song(id):
     song.author= request.form.get('author')
     song.structure= request.form.get('structure')
     db.session.commit()
-    flash('La canción fue editada correctamente.')
     return redirect(url_for('music.manage_music'))
   return render_template('edit_song.html', song= song)
 
@@ -62,9 +83,6 @@ def delete_song(id):
   if user_song:
     db.session.delete(user_song)
     db.session.commit()
-    flash('La canción fue eliminada correctamente.')
-  else:
-    flash('No tienes permisos para eliminar esta canción.')
 
   return redirect(url_for('music.manage_music'))
 
@@ -72,7 +90,6 @@ def delete_song(id):
 @login_required
 def play_song(id):
   song= Song.query.get_or_404(id)
-  flash(f'{song.song_path}')
   return render_template('play_song.html', song= song)
 
 # Ruta para servir los archivos de la carpeta 'uploads' en 'instance'

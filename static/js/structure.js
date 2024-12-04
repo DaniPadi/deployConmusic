@@ -30,3 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedStructureInput.value = currentValues.join(',');
     });
 });
+
+document.querySelector("form").addEventListener("submit", function(event) {
+    event.preventDefault();  // Evitar el envío tradicional
+
+    var formData = new FormData(this);
+
+    fetch("/auth/register", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())  // Suponiendo que la respuesta sea JSON
+    .then(data => {
+        if (data.error) {
+            alert(data.error);  // Muestra el error
+        } else if (data.message) {
+            alert(data.message);  // Muestra el mensaje de éxito
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
