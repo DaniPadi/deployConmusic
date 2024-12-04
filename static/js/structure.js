@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.querySelector("form").addEventListener("submit", function(event) {
     event.preventDefault();  // Evitar el envío tradicional
 
-    var formData = new FormData(this);
+    let formData = new FormData(this);
 
     fetch("/auth/register", {
         method: "POST",
